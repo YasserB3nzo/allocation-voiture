@@ -1,0 +1,599 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Définition de la structure voiture
+typedef struct voiture{
+    int id;
+    char marque[30];
+    char modele[30];
+    char typeCarburant[30];
+    char transmission[30];
+    char nom_utilis[30];
+    float prix_loc;
+    int nbr_place;
+    bool disponible;
+    struct voiture* next;
+    struct voiture* prev;
+}Voiture;
+
+// Affichage du menu
+void Menu(){ 
+    printf("\n*****--- Menu Principal ---*****\n");
+    printf("0- Affichage de cette menu\n");
+    printf("1- Ajouter une voiture\n");
+    printf("2- Modifier une voiture\n");
+    printf("3- Supprimer une voiture\n");
+    printf("4- Afficher toutes les voitures\n");
+    printf("5- Rechercher des voitures par la marque\n");
+    printf("6- Rechercher des voitures par la disponibilite\n");
+    printf("7- Trier par marque\n");
+    printf("8- Trier par prix de location\n");
+    printf("9- Quitter\n\n");
+}
+
+// Déclaration de la procédure d'affichage
+void AfficherTt(Voiture* voitures){
+    Voiture* voiture = voitures->next;
+    int counter = 0;
+    printf("voitures: \n");
+    
+    // Vérifier si la liste est vide
+    if (voiture->next == voiture) {
+        printf("\nAucun voiture a afficher!!\n\n");
+        return;
+    }
+
+    // Parcourir la liste et afficher chaque voitureuit de cette manière
+    do {
+        counter++;
+        printf("\nvoiture %d\n\n", counter);
+        printf("\tid : %d\n", voiture->id);
+        printf("\tMarque : %s", voiture->marque);
+        printf("\tModele : %s", voiture->modele);
+        printf("\tType de carburant : %s", voiture->typeCarburant);
+        printf("\tTransmission : %s", voiture->transmission);
+        printf("\tNom d\'utilisateur : %s", voiture->nom_utilis);
+        printf("\tPrix de location : %.2f\n", voiture->prix_loc);
+        printf("\tNombre de place : %d\n", voiture->nbr_place);
+        printf("\tDisponibilite = %s\n", voiture->disponible ? "Disponible" : "Indisponible");
+
+        printf("\n");
+
+        voiture = voiture->next;
+    } while (voiture != voitures);
+}
+
+// Déclaration des fonctions
+void rech(Voiture* voitures, int choice){
+    Voiture* voiture_index = voitures->next;
+    char target[50];
+    rewind(stdin);
+
+    // Vérifier si la liste est vide
+    if (voiture_index->next == voitures) {
+        printf("\nAucun voiture a afficher!!\n\n");
+        return;
+    }
+
+    int counter = 0;
+    // Si le choix égale à 1 la recherche va t-être émis selon la marque du voiture 
+    if (choice == 1) {
+        printf("\nEntrer le nom de la marque a rechercher : ");
+        fgets(target, sizeof(target), stdin);
+
+        // Boucle sert à chercher la voiture par sa marque
+        while (voiture_index != voitures) {
+            if (!strcmp(voiture_index->marque, target)) {
+                counter++;
+                printf("\n\nvoiture %d\n", counter);
+                printf("\tid : %d\n", voiture_index->id);
+                printf("\tMarque : %s", voiture_index->marque);
+                printf("\tModele : %s", voiture_index->modele);
+                printf("\tType de carburant : %s", voiture_index->typeCarburant);
+                printf("\tTransmission : %s", voiture_index->transmission);
+                printf("\tNom d\'utilisateur : %s", voiture_index->nom_utilis);
+                printf("\tPrix : %.2f\n", voiture_index->prix_loc);
+                printf("\tNombre de place : %d\n", voiture_index->nbr_place);
+                printf("\tDisponibilite = %s\n", voiture_index->disponible ? "Disponible" : "Indisponible");
+
+                printf("\n");
+            }
+            voiture_index = voiture_index->next;
+        }
+    }
+
+    // Si le choix égale à 1 la recherche va t-être émis selon la disponibilite de la voiture 
+    else if (choice == 2) {
+        printf("\nEntrer la disponibilite que vous recherchez (disponible ou indisponible) : ");
+        fgets(target, sizeof(target), stdin);
+
+        // mettre le choix de disponibilite en miniscule
+        for (int i = 0; i < strlen(target); i++) target[i] = tolower(target[i]);
+
+        // Boucle sert à chercher le voiture par le nom de son utilisateur
+        while (voiture_index != voitures) {
+            if (!strcmp(target, "disponible\n") && voiture_index->disponible) {
+                counter++;
+                printf("\nvoiture %d\n\n", counter);
+                printf("\tid : %d\n", voiture_index->id);
+                printf("\tMarque : %s", voiture_index->marque);
+                printf("\tModele : %s", voiture_index->modele);
+                printf("\tType de carburant : %s", voiture_index->typeCarburant);
+                printf("\tTransmission : %s", voiture_index->transmission);
+                printf("\tNom d\'utilisateur : %s", voiture_index->nom_utilis);
+                printf("\tPrix : %.2f\n", voiture_index->prix_loc);
+                printf("\tNombre de place : %d\n", voiture_index->nbr_place);
+                printf("\tDisponibilite = %s\n", voiture_index->disponible ? "Disponible" : "Indisponible");
+
+                printf("\n");
+            }
+            voiture_index = voiture_index->next;
+        }
+
+    }
+
+    // S'il le programme à chercher et n'a rien trouvée donc il n'existe pas d'élément avec le caractère voulue
+    if (!counter) puts("\nces voitures n\'existent pas!!\n");
+}
+
+Voiture* Ajoutvoiture(Voiture* voitures){
+    Voiture voiture;
+
+    // Obtenir de l'utilisateur les elements de ce voiture
+    printf("\nEntrer l\'ID de la voiture : ");
+    scanf("%d", &voiture.id);
+    rewind(stdin);
+    printf("Entrer La marque de la voiture : ");
+    fgets(voiture.marque, sizeof(voiture.marque), stdin);
+    rewind(stdin);
+    printf("Entrer La modele de la voiture : ");
+    fgets(voiture.modele, sizeof(voiture.modele), stdin);
+    rewind(stdin);
+    printf("Entrer La type de carburant de la voiture : ");
+    fgets(voiture.typeCarburant, sizeof(voiture.typeCarburant), stdin);
+    rewind(stdin);
+    printf("Entrer La transmission de la voiture : ");
+    fgets(voiture.transmission, sizeof(voiture.transmission), stdin);
+    rewind(stdin);
+    printf("Entrer Le nom de l\'utilisateur : ");
+    fgets(voiture.nom_utilis, sizeof(voiture.nom_utilis), stdin);
+    rewind(stdin);
+    printf("Entrer Le prix de location de la voiture : ");
+    scanf("%f", &voiture.prix_loc);
+    printf("Entrer Le nombre de place de la voiture : ");
+    scanf("%d", &voiture.nbr_place);
+    rewind(stdin);
+    char disponibilite[50];
+    printf("Entrer La disponibilite de la voiture : ");
+    fgets(disponibilite, sizeof(disponibilite), stdin);
+    for (int i = 0; i < strlen(disponibilite); i++) disponibilite[i] = tolower(disponibilite[i]);
+    if (!strcmp(disponibilite, "disponible\n")) voiture.disponible = true;
+    else if (!strcmp(disponibilite, "indisponible\n")) voiture.disponible = false;
+
+
+    // Affecter ces valeur à une variable pointeur qui va t-être insérer à la liste chainée
+    Voiture* une_voiture = (Voiture*)malloc(sizeof(Voiture));
+    une_voiture->id = voiture.id;
+    strcpy(une_voiture->marque, voiture.marque);
+    strcpy(une_voiture->modele, voiture.modele);
+    strcpy(une_voiture->typeCarburant, voiture.typeCarburant);
+    strcpy(une_voiture->transmission, voiture.transmission);
+    strcpy(une_voiture->nom_utilis, voiture.nom_utilis);
+    une_voiture->prix_loc = voiture.prix_loc;
+    une_voiture->nbr_place = voiture.nbr_place;
+    une_voiture->disponible = voiture.disponible;
+
+    une_voiture->next = voitures;
+    une_voiture->prev = voitures->prev;
+    une_voiture->prev->next = une_voiture;
+    voitures->prev = une_voiture;
+    return voitures;
+}
+
+Voiture* Suppvoiture(Voiture* voiture){
+        Voiture* supprime = voiture->next;
+        int ID;
+
+        printf("\nEntrer l\'ID de la voiture a supprimer : ");
+        scanf("%d", &ID);
+
+        while(supprime != voiture){
+            
+            if (supprime->id == ID) {
+                supprime->prev->next = supprime->next;
+                supprime->next->prev = supprime->prev;
+                free(supprime);
+                return voiture;
+            }
+
+            supprime = supprime->next;
+        }
+        
+        puts("\nID n\'existe pas!!\n");
+        return voiture;
+}
+
+// Fonction sert à affecter les valeurs des élements du voiture 2 (voiture2) au valeurs des élements du voiture 1 (voiture1)
+Voiture* transfer(Voiture* voiture1, Voiture* voiture2){
+    voiture1->id = voiture2->id;
+    strcpy(voiture1->marque, voiture2->marque);
+    strcpy(voiture1->modele, voiture2->modele);
+    strcpy(voiture1->typeCarburant, voiture2->typeCarburant);
+    strcpy(voiture1->transmission, voiture2->transmission);
+    voiture1->prix_loc = voiture2->prix_loc;
+    voiture1->nbr_place = voiture2->nbr_place;
+    voiture1->disponible = voiture2->disponible;
+
+    return voiture1;
+}
+
+Voiture* triage(Voiture* voitures, int choice){
+    // Vérifier si la liste des voitures est vide
+    if (voitures->next == voitures) {
+        puts("Error: La liste des Voitureuits est vide!");
+        return voitures;
+    }
+    
+    Voiture* tmp = (Voiture*)malloc(sizeof(Voiture));
+    Voiture* voiture_indexI = voitures->next;
+
+    // Les boucles de triage par insértion
+    // voiture_indexI est l'indice des élements qui vont t-être comparer avec le reste de la liste
+    while (voiture_indexI != voitures) {
+        Voiture* voiture_indexJ = voitures->next;
+        while (voiture_indexJ != voitures) {
+            if ( (choice == 1 && strcmp(voiture_indexI->marque, voiture_indexJ->marque) < 0) || (choice == 2 && voiture_indexI->prix_loc < voiture_indexJ->prix_loc) ) {
+
+                // La permutation des élements des voiture qui doivent échanger les place dans le liste Voitureuit
+                tmp = transfer(tmp, voiture_indexI);
+                voiture_indexI = transfer(voiture_indexI, voiture_indexJ);
+                voiture_indexJ = transfer(voiture_indexJ, tmp);
+
+            }
+            voiture_indexJ = voiture_indexJ->next;
+        }
+        voiture_indexI = voiture_indexI->next;
+    }
+
+    return voitures;
+}
+
+Voiture* Modifiervoiture(Voiture* voitures){
+    Voiture* voiture_index = voitures->next;
+    int id;
+    char element[50];
+
+    // Vérifier si la liste est vide
+    if (voitures->next == voitures) {
+        puts("Error: La liste des voitures est vide!");
+        return voitures;
+    }
+
+    // Obtenir le Voitureuit à modifier via son ID
+    printf("\nl\'ID de la voiture a modifier : ");
+    scanf("%d", &id);
+
+    while (voiture_index != voitures) {
+
+        // Si le Voitureuit est trouvée accèder cet algorithm
+        if (voiture_index->id == id) {
+
+            // Afficher le menu des élements du Voitureuit valable à modifier
+            printf("\n\tid \t- Pour modifier l\'ID de la voiture\n");
+            printf("\tmarque \t- Pour modifier sa marque\n");
+            printf("\tmodele \t- Pour modifier son modele\n");
+            printf("\tcarburant \t- Pour modifier le type de carburant\n");
+            printf("\ttransmission \t- Pour modifier la transmission\n");
+            printf("\tnomutilisateur \t- Pour modifier le nom de l\'utilisateur\n");
+            printf("\tprixloc \t- Pour modifier le prix de location\n");
+            printf("\tnbrplace \t- Pour modifier le nombre de place\n");
+            printf("\tdisponibilite \t- Pour modifier la disponibilite\n");
+
+            // Obtenir l'élement à modifier
+            rewind(stdin);
+            printf("\nEntrer l\'element que vous voulez modifier : ");
+            fgets(element, sizeof(element), stdin);
+
+            // Mettre les lettres du variable élement en miniscule pour une recherche facile 
+            for (int i = 0; i < strlen(element); i++) element[i] = tolower(element[i]);
+
+            rewind(stdin);
+
+            //**** La recherche du choix de l'utilisateur pour executer
+            if (!strcmp(element, "id\n")) {
+                printf("\nEntrer le nouveau ID du Voitureuit : ");
+                scanf("%d", &voiture_index->id);
+            }
+            
+            else if (!strcmp(element, "marque\n")) {
+                printf("Entrer la nouvelle marque de la voiture : ");
+                fgets(voiture_index->marque, sizeof(voiture_index->marque), stdin);
+            }
+
+            else if (!strcmp(element, "modele\n")) {
+                printf("Entrer la nouvelle modele de la voiture : ");
+                fgets(voiture_index->modele, sizeof(voiture_index->modele), stdin);
+            }
+            
+            else if (!strcmp(element, "carburant\n")) {
+                printf("Entrer le nouveau type de carburant de la voiture : ");
+                fgets(voiture_index->typeCarburant, sizeof(voiture_index->typeCarburant), stdin);
+            }
+            
+            else if (!strcmp(element, "transmission\n")) {
+                printf("Entrer la nouvelle transmission de la voiture : ");
+                fgets(voiture_index->transmission, sizeof(voiture_index->transmission), stdin);
+            }
+
+            else if (!strcmp(element, "nomutilisateur\n")) {
+                printf("Entrer le nouveau type de carburant de la voiture : ");
+                fgets(voiture_index->transmission, sizeof(voiture_index->transmission), stdin);
+            }
+
+            else if (!strcmp(element, "prixloc\n")) {
+                printf("Entrer le nouveau prix de location de cette voiture : ");
+                scanf("%f", &voiture_index->prix_loc);
+            }
+            
+            else if (!strcmp(element, "nbrplace\n")) {
+                printf("Entrer le nouveau nombre de place de la voiture : ");
+                scanf("%f", &voiture_index->nbr_place);
+            }
+
+            else if (!strcmp(element, "disponibilite\n")) {
+                char disponible[50];
+                printf("Entrer la nouvelle disponibilite de la voiture (disponible ou indisponible) : ");
+                fgets(disponible, sizeof(disponible), stdin);
+                if (!strcmp(disponible, "disponible\n")) voiture_index->disponible = true;
+                else if (!strcmp(disponible, "indisponible\n")) voiture_index->disponible = false;
+            }
+                        
+            else printf("\nelement inconnu!!\n");
+            return voitures;
+        }
+        voiture_index = voiture_index->next;
+    }
+
+    puts("\nCet ID n\'existe pas!!\n");
+    return voitures;
+}
+
+Voiture* extraire(Voiture* voitures){
+    FILE* fptr = fopen("Depot.txt", "r");
+
+    int counter = 0;
+    
+    // Vérifier si le fichier "Depot.txt" est ouvert
+    if (fptr == NULL) {
+        puts("\n\nWarning : Impossible d\'acceder au fichier.\n\n");
+        fclose(fptr);
+        return voitures;
+    }
+
+    Voiture voiture;
+    int index = 0;
+    char line[2000];
+
+    // Tant que le fichier "Depot.txt" n'est pas fini extraire les élements des Voitureuits de la liste
+    while (fgets(line, sizeof(line), fptr)){
+        switch (index){
+            case 0:
+                break;
+            case 1:
+                voiture.id = atoi(line);
+                break;
+            
+            case 2:
+                strcpy(voiture.marque, line);
+                break;
+
+            case 3:
+                strcpy(voiture.modele, line);
+                break;
+
+            case 4:
+                strcpy(voiture.typeCarburant, line);
+                break;
+
+            case 5:
+                strcpy(voiture.transmission, line);
+                break;
+
+            case 6:
+                strcpy(voiture.nom_utilis, line);
+                break;
+
+            case 7:
+                voiture.prix_loc = atof(line);
+                break;
+
+            case 8:
+                voiture.nbr_place = atoi(line);
+                break;
+
+            case 9:
+                if (!strcmp(line, "disponible\n")) voiture.disponible = true;
+                else if (!strcmp(line, "indisponible\n")) voiture.disponible = false;
+
+                // Affecter les valeur extractées à une variable pointeur qui va t-être insérer à la liste chainée
+                Voiture* voiture_obj = malloc(sizeof(Voiture));
+                voiture_obj->id = voiture.id;
+                strcpy(voiture_obj->marque, voiture.marque);
+                strcpy(voiture_obj->modele, voiture.modele);
+                strcpy(voiture_obj->typeCarburant, voiture.typeCarburant);
+                strcpy(voiture_obj->transmission, voiture.transmission);
+                strcpy(voiture_obj->nom_utilis, voiture.nom_utilis);
+                voiture_obj->prix_loc = voiture.prix_loc;
+                voiture_obj->nbr_place = voiture.nbr_place;
+                voiture_obj->disponible = voiture.disponible;           
+
+                // Insérer le nouveau Voitureuit à la fin liste chainée
+                voiture_obj->next = voitures;
+                voiture_obj->prev = voitures->prev;
+                voiture_obj->prev->next = voiture_obj;
+                voitures->prev = voiture_obj;
+
+                break;
+
+            default:
+                index = 0;
+                break;
+        }
+
+        index++;
+    }
+
+    fclose(fptr);
+    return voitures;
+}
+
+void inserer(Voiture* voitures){
+    // Insérer la liste des Voitureuits avant de sortir du programme
+    Voiture* Voiture_obj = voitures->next;
+
+    // Vérifier si la liste des Voitureuits est vide
+    if (Voiture_obj != voitures) {
+
+        // Ouvrir le fichier "Depot.txt"
+        FILE* fptr = fopen("Depot.txt", "w");
+        
+        // Vérifier si le fichier "Depot.txt" est ouvert
+        if (fptr == NULL) {
+            puts("\n\nWarning : Impossible d\'acceder au fichier (la liste n'a pas ete enregistrer).\n\n");
+            fclose(fptr);
+            return;
+        }
+
+        // Ecrire chaque Voitureuit dans le fichier "Depot.txt" à cette forme
+        while (Voiture_obj != voitures) {
+            fprintf(fptr, "\n");
+            fprintf(fptr, "%d\n", Voiture_obj->id);
+            fprintf(fptr, "%s", Voiture_obj->marque);
+            fprintf(fptr, "%s", Voiture_obj->modele);
+            fprintf(fptr, "%s", Voiture_obj->typeCarburant);
+            fprintf(fptr, "%s", Voiture_obj->transmission);
+            fprintf(fptr, "%s", Voiture_obj->nom_utilis);
+            fprintf(fptr, "%.2f\n", Voiture_obj->prix_loc);
+            fprintf(fptr, "%d\n", Voiture_obj->nbr_place);
+            if (Voiture_obj->disponible) fprintf(fptr, "disponible\n");
+            else fprintf(fptr, "indisponible\n");
+
+            Voiture_obj = Voiture_obj->next;
+        }
+        
+        printf("\n");
+        fclose(fptr);
+        puts("\n\nLa liste des voiture est ajoute au fichier.\n\n"); 
+    }
+}
+
+Voiture* initialiser(){
+	Voiture* v; 
+	v = (Voiture*)malloc(sizeof(Voiture));
+	v->prev = v;
+	v->next = v;
+	return v;
+}
+
+int main(){
+
+    // Saluer l'utilisateur
+    char nom[50];
+    printf("Salut ! entrer votre nom svp : ");
+	scanf("%s", nom);
+
+    // Initialisation de la liste doublement chainée et extraire les informations du fichier "Depot.txt"
+    Voiture* voitures = initialiser();
+
+    voitures = extraire(voitures);
+
+    int command;
+
+    // Affichage du menu des commandes
+    Menu();
+
+    // La boucle qui va traiter les commandes de l'utilisateur
+    do {
+
+        // obtenir la commande de l'utilisateur
+        command: printf("\nCommand :: ");
+        rewind(stdin);
+        scanf("%d", &command);
+
+
+        printf("\n");
+
+        // La recherche de la commande exacte et l'éxecution
+        switch (command) {
+
+            // L'affichage du menu
+            case 0:
+                Menu();
+                break;
+
+            // L'éxecution des commandes de l'ajout
+            case 1:
+                voitures = Ajoutvoiture(voitures);
+                printf("\nvoiture est ajouter.\n");
+                break;
+            
+            // L'éxecution de la modification
+            //****** Modification des elements de la voiture
+            case 2:
+                voitures = Modifiervoiture(voitures);
+                printf("\nVoiture est modifier.\n");
+                break;
+            
+            // L'éxecution des commandes de la suppression
+            case 3:
+                voitures = Suppvoiture(voitures);
+                printf("\nVoiture est supprimer.\n");
+                break;
+            
+            // L'éxecution de l'affichage
+            case 4:
+                AfficherTt(voitures);
+                break;
+
+            // L'éxecution des commandes de la recherche
+            //****** Recherche par la marque du Voiture
+            case 5:
+                rech(voitures, 1);
+                break;
+            
+            //****** Recherche par le modele de la disponibilité
+            case 6:
+                rech(voitures, 2);
+                break;
+
+            // L'éxecution des commandes du triage
+            //****** Triage par les marque des voitures
+            case 7:
+                voitures = triage(voitures, 1);
+                printf("\nVoiture est triee.\n");
+                break;
+            
+            //****** Triage par les prix de location des voitures
+            case 8:
+                voitures = triage(voitures, 2);
+                printf("\nVoiture est triee.\n");
+                break;
+            
+            // Sortir du programme
+            case 9: break;
+
+            default:
+                printf("\nThe command is invalid!!!\n");
+                goto command;
+        }
+
+    } while (command != 9);
+
+    inserer(voitures);
+
+    free(voitures);
+    return 0;
+}
